@@ -2,39 +2,16 @@ import json
 import os
 from ..models import Course, Room, TimeSlot
 
+
 class Configuration:
 
     def __init__(self):
+        """Starts empty — load a JSON file from the UI (or add rows manually)."""
         self.courses = []
         self.rooms = []
         self.timeslots = []
         self.student_conflict_groups = []
-        self.load_defaults()
-
-    def load_defaults(self):
-
-        base_path = os.path.dirname(os.path.dirname(__file__))
-        default_path = os.path.join(base_path, "data", "default_config.json")
-
-        if os.path.exists(default_path):
-            self.load_from_file(default_path)
-        else:
-
-            self.courses = [
-                Course("C1", "AI", "Dr. Smith", 40), Course("C2", "Data Structures", "Dr. Jones", 55),
-                Course("C3", "Database", "Dr. Smith", 35), Course("C4", "Web Dev", "Prof. Alan", 60),
-                Course("C5", "OS", "Dr. Brown", 45), Course("C6", "Networks", "Dr. Jones", 50),
-                Course("C7", "Calculus", "Prof. White", 100), Course("C8", "Physics", "Dr. Green", 80)
-            ]
-            self.rooms = [Room("R1", 50), Room("R2", 60), Room("R3", 120)]
-            self.timeslots = [
-                TimeSlot("T1", "Monday", "09:00 AM"), TimeSlot("T2", "Monday", "02:00 PM"),
-                TimeSlot("T3", "Tuesday", "09:00 AM"), TimeSlot("T4", "Tuesday", "02:00 PM"),
-                TimeSlot("T5", "Wednesday", "09:00 AM")
-            ]
-            self.student_conflict_groups = [
-                ["C1", "C2", "C5"], ["C3", "C4"], ["C7", "C8"]
-            ]
+        self.loaded_from_path = None
 
     def save_to_file(self, filepath):
 
@@ -49,6 +26,7 @@ class Configuration:
         }
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=2)
+        self.loaded_from_path = os.path.abspath(filepath)
 
     def load_from_file(self, filepath):
 
@@ -62,6 +40,7 @@ class Configuration:
             self.timeslots = [TimeSlot(t["id"], t["day"], t["time"])
                              for t in data.get("timeslots", [])]
             self.student_conflict_groups = data.get("student_conflicts", [])
+            self.loaded_from_path = os.path.abspath(filepath)
 
             return True, "Configuration loaded successfully"
         except Exception as e:
@@ -73,6 +52,7 @@ class Configuration:
         self.rooms = []
         self.timeslots = []
         self.student_conflict_groups = []
+        self.loaded_from_path = None
 
     def get_course_group(self, course_id):
 

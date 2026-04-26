@@ -8,37 +8,50 @@ class ControlTab(QWidget):
         self.run_ga_callback = run_ga_callback
         self.init_ui()
 
+    _STATUS_IDLE_STYLE = "font-size: 18px; font-weight: bold; color: #4fc1ff; margin-bottom: 10px;"
+
     def init_ui(self):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(40, 40, 40, 40)
-        layout.setSpacing(20)
-        status_group = QGroupBox("Optimization Status")
+        layout.setContentsMargins(32, 28, 32, 28)
+        layout.setSpacing(18)
+
+        hint = QLabel(
+            "Use Configuration first to set courses, rooms, and slots. "
+            "While a run is in progress, open Live Visualization to watch fitness improve. "
+            "When the run finishes, the timetable opens automatically."
+        )
+        hint.setObjectName("sectionHint")
+        hint.setWordWrap(True)
+        layout.addWidget(hint)
+
+        status_group = QGroupBox("Run status")
         status_layout = QVBoxLayout()
-        self.status_label = QLabel("Status: IDLE")
+        self.status_label = QLabel("Ready — not running")
         self.status_label.setAlignment(Qt.AlignCenter)
-        self.status_label.setStyleSheet("font-size: 18px; font-weight: bold; color: #4fc1ff; margin-bottom: 10px;")
+        self.status_label.setStyleSheet(self._STATUS_IDLE_STYLE)
         status_layout.addWidget(self.status_label)
         self.progress_bar = QProgressBar()
-        self.progress_bar.setMaximum(200) 
+        self.progress_bar.setMaximum(200)
+        self.progress_bar.setFormat("Generation %v / %m")
         status_layout.addWidget(self.progress_bar)
         status_group.setLayout(status_layout)
         layout.addWidget(status_group)
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
-        self.start_btn = QPushButton("🚀 Run Genetic Algorithm")
+        self.start_btn = QPushButton("Run genetic algorithm")
         self.start_btn.setObjectName("primaryAction")
-        self.start_btn.setMinimumHeight(60)
-        self.start_btn.setMinimumWidth(300)
-        self.start_btn.setStyleSheet("font-size: 18px;")
+        self.start_btn.setMinimumHeight(52)
+        self.start_btn.setMinimumWidth(280)
+        self.start_btn.setToolTip("Validates configuration and starts scheduling (up to 200 generations)")
         self.start_btn.clicked.connect(self.run_ga_callback)
         btn_layout.addWidget(self.start_btn)
         btn_layout.addStretch()
         layout.addLayout(btn_layout)
-        log_group = QGroupBox("Engine Logs")
+        log_group = QGroupBox("Run log")
         log_layout = QVBoxLayout()
         self.log_output = QTextEdit()
         self.log_output.setReadOnly(True)
-        self.log_output.setPlaceholderText("Waiting for engine start...")
+        self.log_output.setPlaceholderText("Log lines appear here when you start a run…")
         log_layout.addWidget(self.log_output)
         log_group.setLayout(log_layout)
         layout.addWidget(log_group)
@@ -47,6 +60,8 @@ class ControlTab(QWidget):
         self.status_label.setText(text)
         if style:
             self.status_label.setStyleSheet(style)
+        else:
+            self.status_label.setStyleSheet(self._STATUS_IDLE_STYLE)
 
     def update_progress(self, val):
         self.progress_bar.setValue(val)

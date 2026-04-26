@@ -1,0 +1,59 @@
+{
+  "_description": "Four courses are in the same student cohort and cannot share an exam slot, but only THREE slots exist — at least one cohort conflict is unavoidable, so fitness 1.0 is impossible.",
+  "courses": [
+    {
+      "id": "X1",
+      "name": "Shared cohort — course A",
+      "instructor": "Prof. Adams",
+      "students": 25
+    },
+    {
+      "id": "X2",
+      "name": "Shared cohort — course B",
+      "instructor": "Prof. Baker",
+      "students": 25
+    },
+    {
+      "id": "X3",
+      "name": "Shared cohort — course C",
+      "instructor": "Prof. Chen",
+      "students": 25
+    },
+    {
+      "id": "X4",
+      "name": "Shared cohort — course D",
+      "instructor": "Prof. Diaz",
+      "students": 25
+    }
+  ],
+  "rooms": [
+    {
+      "id": "Hall-1",
+      "capacity": 80
+    },
+    {
+      "id": "Hall-2",
+      "capacity": 80
+    }
+  ],
+  "timeslots": [
+    {
+      "id": "S1",
+      "day": "Monday",
+      "time": "09:00 AM"
+    },
+    {
+      "id": "S2",
+      "day": "Monday",
+      "time": "02:00 PM"
+    },
+    {
+      "id": "S3",
+      "day": "Tuesday",
+      "time": "09:00 AM"
+    }
+  ],
+  "student_conflicts": [
+    ["X1", "X2", "X3", "X4"]
+  ]
+}

@@ -3,6 +3,100 @@ QMainWindow {
     background-color: #121212;
 }
 
+QLabel#pageTitle {
+    color: #e8e8e8;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+QLabel#pageSubtitle {
+    color: #9d9d9d;
+    font-size: 13px;
+}
+
+QLabel#sectionHint {
+    color: #858585;
+    font-size: 12px;
+    margin-top: 2px;
+    margin-bottom: 8px;
+}
+
+QLabel#tableSectionTitle {
+    color: #c8c8c8;
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: 12px;
+    margin-bottom: 4px;
+}
+
+QFrame#infoStrip {
+    background-color: #252526;
+    border: 1px solid #3e3e42;
+    border-radius: 8px;
+    padding: 2px;
+}
+
+QLabel#infoStripText {
+    color: #b8b8b8;
+    font-size: 12px;
+    padding: 10px 14px;
+}
+
+QLabel#dataStatusBanner {
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+}
+
+QLabel#dataStatusBanner[warning="true"] {
+    background-color: #3d2e10;
+    border: 1px solid #8a6d2a;
+    color: #f0d090;
+}
+
+QLabel#dataStatusBanner[warning="false"] {
+    background-color: #1a2e24;
+    border: 1px solid #2d6a4f;
+    color: #a8d5ba;
+}
+
+QLabel#emptyStateTitle {
+    color: #e8e8e8;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+QLabel#assignmentSummary {
+    color: #9d9d9d;
+    font-size: 13px;
+}
+
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+
+QScrollArea > QWidget > QWidget {
+    background-color: transparent;
+}
+
+QSplitter::handle {
+    background-color: #3e3e42;
+    width: 3px;
+}
+
+QSplitter::handle:hover {
+    background-color: #007acc;
+}
+
+QStatusBar {
+    background-color: #252526;
+    color: #b0b0b0;
+    border-top: 1px solid #3e3e42;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
 QTabWidget::pane {
     border: 1px solid #333333;
     background-color: #1e1e1e;
