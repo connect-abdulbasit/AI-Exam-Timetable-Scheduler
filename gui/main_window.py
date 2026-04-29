@@ -1,11 +1,11 @@
-from PyQt5.QtWidgets import QMainWindow, QTabWidget, QMessageBox, QStatusBar
+from PyQt5.QtWidgets import QMainWindow, QTabWidget, QMessageBox
 from .config_tab import ConfigTab
 from .control_tab import ControlTab
 from .graph_tab import GraphTab
 from .results_tab import ResultsTab
 from .styles import DARK_STYLESHEET
-from ..core.config import Configuration
-from ..core.genetic_algorithm import GAWorker
+from core.config import Configuration
+from core.genetic_algorithm import GAWorker
 
 class AppWindow(QMainWindow):
     def __init__(self):
@@ -24,18 +24,9 @@ class AppWindow(QMainWindow):
         self.graph_tab = GraphTab()
         self.results_tab = ResultsTab(self.config)
         self.tabs.addTab(self.config_tab, "1  Setup")
-        self.tabs.setTabToolTip(0, "Define courses, rooms, time slots, and load or save JSON.")
         self.tabs.addTab(self.control_tab, "2  Run")
-        self.tabs.setTabToolTip(1, "Start the genetic algorithm and read the run log.")
         self.tabs.addTab(self.graph_tab, "3  Chart")
-        self.tabs.setTabToolTip(2, "Fitness vs generation — updates while a run is active.")
         self.tabs.addTab(self.results_tab, "4  Timetable")
-        self.tabs.setTabToolTip(3, "Best schedule after each completed run.")
-
-        self.status_bar = QStatusBar()
-        self.setStatusBar(self.status_bar)
-        self.tabs.currentChanged.connect(self._on_tab_changed)
-        self._on_tab_changed(self.tabs.currentIndex())
 
     def start_ga(self):
         errors = self.config.validate()
@@ -53,16 +44,6 @@ class AppWindow(QMainWindow):
         self.worker.progress_update.connect(self.update_progress)
         self.worker.finished_signal.connect(self.ga_finished)
         self.worker.start()
-
-    def _on_tab_changed(self, index):
-        tips = (
-            "Tip: Load a JSON file on Setup (or add rows), then switch to Run.",
-            "Tip: Run uses the data from Setup. Validation errors open in a dialog.",
-            "Tip: This chart fills as generations complete — stay on Run to drive updates.",
-            "Tip: After a run, the best timetable is listed here (conflict groups use row colors).",
-        )
-        if 0 <= index < len(tips):
-            self.status_bar.showMessage(tips[index])
 
     def update_progress(self, gen, fitness, current_best):
         self.control_tab.update_status(f"Running — generation {gen}")

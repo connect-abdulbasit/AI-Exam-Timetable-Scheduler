@@ -2,9 +2,9 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
                              QLineEdit, QSpinBox, QComboBox, QFormLayout,
                              QGroupBox, QLabel, QTableWidget, QTableWidgetItem,
                              QHeaderView, QStyle, QMessageBox, QFileDialog,
-                             QScrollArea, QSplitter, QFrame, QSizePolicy)
+                             QScrollArea, QSplitter, QSizePolicy)
 from PyQt5.QtCore import Qt
-from ..models import Course, Room, TimeSlot
+from models import Course, Room, TimeSlot
 
 
 class ConfigTab(QWidget):
@@ -27,10 +27,7 @@ class ConfigTab(QWidget):
 
         title = QLabel("Exam data")
         title.setObjectName("pageTitle")
-        subtitle = QLabel(
-            "The app starts with no exam data. Load a JSON file below (or add rows manually). "
-            "The tables on the right show exactly what Run will use."
-        )
+        subtitle = QLabel("Load JSON or add rows manually.")
         subtitle.setObjectName("pageSubtitle")
         subtitle.setWordWrap(True)
         root.addWidget(title)
@@ -41,32 +38,13 @@ class ConfigTab(QWidget):
         self.data_status.setWordWrap(True)
         root.addWidget(self.data_status)
 
-        strip = QFrame()
-        strip.setObjectName("infoStrip")
-        strip_layout = QVBoxLayout(strip)
-        strip_layout.setContentsMargins(0, 0, 0, 0)
-        strip_text = QLabel(
-            "<b>Workflow</b> — Nothing loads automatically. Use <b>Load JSON…</b> and pick your file "
-            "(same shape as <code>data/exam_config.json</code>), or add rows manually. "
-            "Optional: <code>data/exam_config_unsatisfiable.json</code> is built so cohort rules cannot all be satisfied "
-            "(fewer slots than courses in one group) — runs should finish with fitness below 1.0. "
-            "Keys: <code>courses</code>, <code>rooms</code>, <code>timeslots</code>, <code>student_conflicts</code>."
-        )
-        strip_text.setObjectName("infoStripText")
-        strip_text.setWordWrap(True)
-        strip_text.setTextFormat(Qt.RichText)
-        strip_layout.addWidget(strip_text)
-        root.addWidget(strip)
-
         toolbar = QHBoxLayout()
         toolbar.setSpacing(10)
         load_btn = QPushButton("Load JSON…")
         load_btn.setObjectName("primaryAction")
-        load_btn.setToolTip("Replace current data from your exam configuration JSON")
         load_btn.clicked.connect(self.load_config_file)
 
         save_btn = QPushButton("Save JSON…")
-        save_btn.setToolTip("Write courses, rooms, time slots, and conflict groups to disk")
         save_btn.clicked.connect(self.save_config_file)
 
         toolbar.addWidget(load_btn)
@@ -83,9 +61,6 @@ class ConfigTab(QWidget):
         left_col.setContentsMargins(0, 0, 12, 0)
 
         courses_group = QGroupBox("Courses")
-        courses_hint = QLabel("Exams to schedule — each needs a unique ID.")
-        courses_hint.setObjectName("sectionHint")
-        courses_hint.setWordWrap(True)
         courses_form = QFormLayout()
         self.course_id_input = QLineEdit()
         self.course_id_input.setPlaceholderText("e.g. CS101")
@@ -104,15 +79,11 @@ class ConfigTab(QWidget):
         add_course_btn.clicked.connect(self.add_course)
         courses_form.addRow("", add_course_btn)
         cg_layout = QVBoxLayout()
-        cg_layout.addWidget(courses_hint)
         cg_layout.addLayout(courses_form)
         courses_group.setLayout(cg_layout)
         left_col.addWidget(courses_group)
 
         rooms_group = QGroupBox("Rooms")
-        rooms_hint = QLabel("Rooms must fit peak enrollment for any exam placed there.")
-        rooms_hint.setObjectName("sectionHint")
-        rooms_hint.setWordWrap(True)
         rooms_form = QFormLayout()
         self.room_id_input = QLineEdit()
         self.room_id_input.setPlaceholderText("e.g. Hall A")
@@ -127,15 +98,11 @@ class ConfigTab(QWidget):
         add_room_btn.clicked.connect(self.add_room)
         rooms_form.addRow("", add_room_btn)
         rg_layout = QVBoxLayout()
-        rg_layout.addWidget(rooms_hint)
         rg_layout.addLayout(rooms_form)
         rooms_group.setLayout(rg_layout)
         left_col.addWidget(rooms_group)
 
         slots_group = QGroupBox("Time slots")
-        slots_hint = QLabel("Each slot is one possible exam window (day + time label).")
-        slots_hint.setObjectName("sectionHint")
-        slots_hint.setWordWrap(True)
         slots_form = QFormLayout()
         self.slot_id_input = QLineEdit()
         self.slot_id_input.setPlaceholderText("e.g. T1")
@@ -153,10 +120,24 @@ class ConfigTab(QWidget):
         add_slot_btn.clicked.connect(self.add_timeslot)
         slots_form.addRow("", add_slot_btn)
         sg_layout = QVBoxLayout()
-        sg_layout.addWidget(slots_hint)
         sg_layout.addLayout(slots_form)
         slots_group.setLayout(sg_layout)
         left_col.addWidget(slots_group)
+
+        conflicts_group = QGroupBox("Conflict groups")
+        conflicts_form = QFormLayout()
+        self.conflict_courses_input = QLineEdit()
+        self.conflict_courses_input.setPlaceholderText("e.g. CS101, CS102, MTH201")
+        conflicts_form.addRow("Course IDs:", self.conflict_courses_input)
+
+        add_conflict_btn = QPushButton("Add group")
+        add_conflict_btn.setObjectName("primaryAction")
+        add_conflict_btn.clicked.connect(self.add_conflict_group)
+        conflicts_form.addRow("", add_conflict_btn)
+        cfg_layout = QVBoxLayout()
+        cfg_layout.addLayout(conflicts_form)
+        conflicts_group.setLayout(cfg_layout)
+        left_col.addWidget(conflicts_group)
 
         left_col.addStretch()
         left_scroll = self._wrap_scroll(left_inner)
@@ -206,17 +187,11 @@ class ConfigTab(QWidget):
         tables_layout.addWidget(self.slots_table)
 
         tables_layout.addWidget(section("Student conflict groups (read-only)"))
-        groups_expl = QLabel(
-            "Courses in the same group must not overlap for students. "
-            "Edit groups by loading a JSON file that includes \"student_conflicts\"."
-        )
-        groups_expl.setObjectName("sectionHint")
-        groups_expl.setWordWrap(True)
-        tables_layout.addWidget(groups_expl)
         self.groups_table = QTableWidget()
-        self.groups_table.setColumnCount(2)
-        self.groups_table.setHorizontalHeaderLabels(["Group", "Courses"])
+        self.groups_table.setColumnCount(3)
+        self.groups_table.setHorizontalHeaderLabels(["Group", "Courses", ""])
         self.groups_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.groups_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self.groups_table.setMinimumHeight(80)
         tables_layout.addWidget(self.groups_table)
 
@@ -357,6 +332,13 @@ class ConfigTab(QWidget):
         for i, group in enumerate(self.config.student_conflict_groups):
             self.groups_table.setItem(i, 0, QTableWidgetItem(f"Group {i+1}"))
             self.groups_table.setItem(i, 1, QTableWidgetItem(", ".join(group)))
+            remove_btn = QPushButton()
+            remove_btn.setIcon(self.style().standardIcon(QStyle.SP_TrashIcon))
+            remove_btn.setObjectName("dangerAction")
+            remove_btn.setToolTip("Remove Conflict Group")
+            remove_btn.setFixedWidth(40)
+            remove_btn.clicked.connect(lambda checked, row=i: self.remove_conflict_group(row))
+            self.groups_table.setCellWidget(i, 2, remove_btn)
 
     def remove_course(self, row):
         if 0 <= row < len(self.config.courses):
@@ -375,6 +357,43 @@ class ConfigTab(QWidget):
             self.config.timeslots.pop(row)
             self.refresh_slots_table()
             self._update_data_status_banner()
+
+    def add_conflict_group(self):
+        raw = self.conflict_courses_input.text().strip()
+        if not raw:
+            QMessageBox.warning(self, "Input Error", "Enter at least two course IDs")
+            return
+
+        group = [course_id.strip() for course_id in raw.split(",") if course_id.strip()]
+        unique_group = list(dict.fromkeys(group))
+        if len(unique_group) < 2:
+            QMessageBox.warning(self, "Input Error", "A conflict group needs at least two course IDs")
+            return
+
+        valid_ids = {course.id for course in self.config.courses}
+        missing = [cid for cid in unique_group if cid not in valid_ids]
+        if missing:
+            QMessageBox.warning(
+                self,
+                "Invalid Course IDs",
+                "These course IDs do not exist: " + ", ".join(missing),
+            )
+            return
+
+        normalized = sorted(unique_group)
+        existing = [sorted(g) for g in self.config.student_conflict_groups]
+        if normalized in existing:
+            QMessageBox.information(self, "Duplicate Group", "This conflict group already exists")
+            return
+
+        self.config.student_conflict_groups.append(unique_group)
+        self.refresh_groups_table()
+        self.conflict_courses_input.clear()
+
+    def remove_conflict_group(self, row):
+        if 0 <= row < len(self.config.student_conflict_groups):
+            self.config.student_conflict_groups.pop(row)
+            self.refresh_groups_table()
 
     def load_config_file(self):
         filepath, _ = QFileDialog.getOpenFileName(

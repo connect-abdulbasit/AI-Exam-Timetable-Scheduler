@@ -12,7 +12,6 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QFileDialog,
     QMessageBox,
-    QFrame,
     QAbstractItemView,
 )
 from PyQt5.QtCore import Qt
@@ -34,14 +33,7 @@ class ResultsTab(QWidget):
 
         title = QLabel("Timetable (assignment)")
         title.setObjectName("pageTitle")
-        subtitle = QLabel(
-            "Each row is one course’s room and time slot after a run. "
-            "Background tint matches student conflict groups when defined in your JSON."
-        )
-        subtitle.setObjectName("pageSubtitle")
-        subtitle.setWordWrap(True)
         layout.addWidget(title)
-        layout.addWidget(subtitle)
 
         self.stack = QStackedWidget()
         self.empty_page = QWidget()
@@ -52,21 +44,7 @@ class ResultsTab(QWidget):
         empty_title = QLabel("No assignment to show yet")
         empty_title.setObjectName("emptyStateTitle")
         empty_title.setAlignment(Qt.AlignCenter)
-
-        steps = QLabel(
-            "<ol style='margin-left: 24px;'>"
-            "<li style='margin-bottom: 8px;'><b>Setup</b> — Load or build your exam JSON (courses, rooms, slots).</li>"
-            "<li style='margin-bottom: 8px;'><b>Run</b> — Start the genetic algorithm and wait until it finishes.</li>"
-            "<li><b>Here</b> — The best room/slot assignment appears automatically; you can export it as JSON.</li>"
-            "</ol>"
-        )
-        steps.setObjectName("pageSubtitle")
-        steps.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        steps.setWordWrap(True)
-        steps.setTextFormat(Qt.RichText)
-
         empty_layout.addWidget(empty_title)
-        empty_layout.addWidget(steps)
 
         self.table_page = QWidget()
         table_layout = QVBoxLayout(self.table_page)
@@ -77,25 +55,10 @@ class ResultsTab(QWidget):
         self.summary_label.setObjectName("assignmentSummary")
         self.summary_label.setWordWrap(True)
         export_btn = QPushButton("Export assignment JSON…")
-        export_btn.setToolTip("Save course → room and time slot mapping (and fitness) to a file")
         export_btn.clicked.connect(self._export_assignment)
         toolbar.addWidget(self.summary_label, 1)
         toolbar.addWidget(export_btn)
         table_layout.addLayout(toolbar)
-
-        legend = QFrame()
-        legend.setObjectName("infoStrip")
-        leg_layout = QVBoxLayout(legend)
-        leg_layout.setContentsMargins(0, 0, 0, 0)
-        leg = QLabel(
-            "<b>Reading the table</b> — Slot shows day and time from your configuration. "
-            "Export is useful for publishing or importing elsewhere; it does not replace saving exam <i>input</i> on Setup."
-        )
-        leg.setObjectName("infoStripText")
-        leg.setWordWrap(True)
-        leg.setTextFormat(Qt.RichText)
-        leg_layout.addWidget(leg)
-        table_layout.addWidget(legend)
 
         self.table = QTableWidget()
         self.table.setColumnCount(6)

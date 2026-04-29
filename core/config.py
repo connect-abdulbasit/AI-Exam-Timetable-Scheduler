@@ -1,12 +1,11 @@
 import json
 import os
-from ..models import Course, Room, TimeSlot
+from models import Course, Room, TimeSlot
 
 
 class Configuration:
 
     def __init__(self):
-        """Starts empty — load a JSON file from the UI (or add rows manually)."""
         self.courses = []
         self.rooms = []
         self.timeslots = []

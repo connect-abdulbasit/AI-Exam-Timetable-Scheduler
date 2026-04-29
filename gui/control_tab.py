@@ -15,15 +15,6 @@ class ControlTab(QWidget):
         layout.setContentsMargins(32, 28, 32, 28)
         layout.setSpacing(18)
 
-        hint = QLabel(
-            "Use Configuration first to set courses, rooms, and slots. "
-            "While a run is in progress, open Live Visualization to watch fitness improve. "
-            "When the run finishes, the timetable opens automatically."
-        )
-        hint.setObjectName("sectionHint")
-        hint.setWordWrap(True)
-        layout.addWidget(hint)
-
         status_group = QGroupBox("Run status")
         status_layout = QVBoxLayout()
         self.status_label = QLabel("Ready — not running")
@@ -42,7 +33,6 @@ class ControlTab(QWidget):
         self.start_btn.setObjectName("primaryAction")
         self.start_btn.setMinimumHeight(52)
         self.start_btn.setMinimumWidth(280)
-        self.start_btn.setToolTip("Validates configuration and starts scheduling (up to 200 generations)")
         self.start_btn.clicked.connect(self.run_ga_callback)
         btn_layout.addWidget(self.start_btn)
         btn_layout.addStretch()
